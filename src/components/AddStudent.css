@@ -1,0 +1,29 @@
+.add-student {
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    width: 300px;
+    margin: 0 auto;
+  }
+  
+  .add-student input {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .add-student button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-student button:hover {
+    background-color: #45a049;
+  }
+  
