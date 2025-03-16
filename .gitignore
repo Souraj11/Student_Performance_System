@@ -1,17 +1,21 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+
+
+node_modules
+.pnp
 .pnp.js
 
-# testing
-/coverage
 
-# production
+venv/
+.env/
+
+
+coverage/
+
+
 /build
 
-# misc
+
 .DS_Store
 .env.local
 .env.development.local
@@ -21,3 +25,22 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+
+database.py
+config.py
+firebase_config.json
+
+student-performance-syst-a49d8-firebase-adminsdk-fbsvc-004baa13d6.json
+
+
+dataconnect/
+dataconnect generated/
+

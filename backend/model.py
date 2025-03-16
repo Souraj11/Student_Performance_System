@@ -1,26 +1,46 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from database import Base
+import json
+from database import db
 
 
-# Student Model
-class Student(Base):
-    __tablename__ = "students"
+class Student:
+    def __init__(self, enrollment_no, name, quiz_score, attendance, studytime, engagement_score):
+        self.enrollment_no = enrollment_no
+        self.name = name
+        self.quiz_score = quiz_score
+        self.attendance = attendance
+        self.studytime = studytime
+        self.engagement_score = engagement_score
 
-    enrollment_no = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    age = Column(Integer)
-    quiz_score = Column(Float)
-    attendance = Column(Float)
-    studytime = Column(Float)
-    engagement_score = Column(Float)
+    def save(self):
+        student_ref = db.collection("students").document(str(self.enrollment_no))
+        student_ref.set(self.__dict__) 
+
+    @staticmethod
+    def get_student(enrollment_no):
+        student_ref = db.collection("students").document(str(enrollment_no)).get()
+        if student_ref.exists:
+            return json.dumps(student_ref.to_dict())  
+        return json.dumps({"error": "Student not found"})
 
 
+class Performance:
+    def __init__(self, enrollment_no, quiz_score, study_time):
+        self.enrollment_no = enrollment_no
+        self.quiz_score = quiz_score
+        self.study_time = study_time
 
-# Performance Model
-class Performance(Base):
-    __tablename__ = "performance"
+    def save(self):
+        performance_ref = (
+            db.collection("students")
+            .document(str(self.enrollment_no))
+            .collection("performance")
+            .document()
+        )
+        performance_ref.set(self.__dict__)  
 
-    id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("students.id"))
-    quiz_score = Column(Float)
-    study_time = Column(Float)
+    @staticmethod
+    def get_performance(enrollment_no):
+        performance_ref = (
+            db.collection("students").document(str(enrollment_no)).collection("performance").stream()
+        )
+        return json.dumps([entry.to_dict() for entry in performance_ref])  

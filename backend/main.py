@@ -1,17 +1,20 @@
 from fastapi import FastAPI
-from database import engine, Base
-from routes import student, ai
+from root.student import router as student_router
+from fastapi.middleware.cors import CORSMiddleware
 
-# Create FastAPI instance
 app = FastAPI()
 
-# Include student and AI routes
-app.include_router(student.router)
-app.include_router(ai.router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Initialize the database
-Base.metadata.create_all(bind=engine)
+
+app.include_router(student_router, prefix="/api")
 
 @app.get("/")
-def home():
-    return {"message": "Student Performance API is running"}
+def root():
+    return {"message": "Student Performance Analysis API is running"}

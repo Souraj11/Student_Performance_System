@@ -1,20 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-DATABASE_URL = "https://console.firebase.google.com/u/0/project/student-performance-syst-a49d8/database/student-performance-syst-a49d8-default-rtdb/data/~2F"  # Update with correct details
 
-# Database engine setup
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+cred = credentials.Certificate("C:\\Users\\soura\\Student_performace_analysis_system\\backend\\student-performance-syst-a49d8-firebase-adminsdk-fbsvc-004baa13d6.json")
+firebase_admin.initialize_app(cred)
 
-# Base class for models
-Base = declarative_base()
 
-# Dependency to get a DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+db = firestore.client()

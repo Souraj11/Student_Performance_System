@@ -5,6 +5,7 @@ import StudentList from "./components/StudentList";
 import AddStudent from "./components/AddStudent";
 import AIRecommendation from "./components/AIRecommendation";
 import Login from "./components/Login";
+import StudentDashboard from "./components/StudentDashboard";  
 import { auth } from "./firebaseConfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import "./App.css";
@@ -19,7 +20,7 @@ function App() {
   const [students, setStudents] = useState([]);
   const [user, setUser] = useState(null);
 
-  // Firebase Auth State Listener
+ 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -41,10 +42,10 @@ function App() {
         )}
 
         <Routes>
-          {/* Login Route */}
+          {}
           <Route path="/login" element={<Login setUser={setUser} />} />
 
-          {/* Protected Main Page */}
+          {}
           <Route
             path="/"
             element={
@@ -66,7 +67,7 @@ function App() {
             }
           />
 
-          {/* AI Recommendation Page (Also Protected) */}
+          {}
           <Route
             path="/ai-recommendation/:enrollmentNumber"
             element={
@@ -77,6 +78,24 @@ function App() {
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 >
                   <AIRecommendation students={students} />
+                </motion.div>
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {}
+          <Route
+            path="/dashboard/:enrollmentNo"
+            element={
+              user ? (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <StudentDashboard />
                 </motion.div>
               ) : (
                 <Navigate to="/login" />
