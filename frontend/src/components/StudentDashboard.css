@@ -1,53 +1,92 @@
+/* Student Dashboard Styles */
 .student-dashboard {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    font-family: Arial, sans-serif;
+  padding: 20px; /* Padding around the dashboard */
+  max-width: 800px; /* Maximum width of the dashboard */
+  margin: 0 auto; /* Center dashboard horizontally */
+  font-family: 'Poppins', sans-serif; /* Font family */
+  background: #f4f7fc; /* Light background color */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+/* Content Container */
+.dashboard-content {
+  margin-top: 20px; /* Space above content */
+}
+
+/* Session Card Styles */
+.session {
+  border: 1px solid #ddd; /* Light gray border */
+  padding: 20px; /* Inner padding */
+  margin-bottom: 15px; /* Space between session cards */
+  border-radius: 10px; /* Rounded corners */
+  background: #ffffff; /* White background */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effects */
+}
+
+/* Hover Effect for Session Cards */
+.session:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+}
+
+/* Paragraph Styles within Sessions */
+.session p {
+  margin: 8px 0; /* Space above and below paragraphs */
+  font-size: 16px; /* Font size for text */
+  color: #333; /* Dark gray text color */
+}
+
+/* Quiz Action Container */
+.quiz-actions {
+  margin-top: 20px; /* Space above the actions */
+  text-align: center; /* Center content */
+}
+
+/* Button Styles */
+.take-quiz-btn {
+  padding: 12px 25px; /* Padding for button */
+  font-size: 18px; /* Font size for button text */
+  font-weight: 600; /* Bold font weight */
+  border: none; /* No border */
+  border-radius: 8px; /* Rounded corners */
+  background: linear-gradient(135deg, #28a745, #218838); /* Gradient background */
+  color: white; /* White text color */
+  cursor: pointer; /* Pointer cursor */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition effects */
+}
+
+/* Hover Effect for the Button */
+.take-quiz-btn:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34); /* Darker gradient on hover */
+  transform: scale(1.05); /* Slightly enlarge button */
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); /* Shadow on hover */
+}
+
+/* Loading, Error, and Not Found Text Styles */
+.loading, .error, .not-found {
+  text-align: center; /* Center text */
+  font-size: 18px; /* Font size for status messages */
+  font-weight: 600; /* Bold font weight */
+  margin-top: 20px; /* Space above status messages */
+}
+
+.error {
+  color: #dc3545; /* Red color for error messages */
+}
+
+.not-found {
+  color: #6c757d; /* Gray color for not found messages */
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+  .student-dashboard {
+    padding: 15px; /* Reduce padding on small screens */
   }
   
-  .dashboard-content {
-    background-color: #f0f0f0;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  .take-quiz-btn {
+    width: 100%; /* Full width button on mobile */
+    font-size: 16px; /* Slightly smaller font size */
   }
-  
-  .dashboard-content p {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 12px 0;
-    color: #333;
-  }
-  
-  .session {
-    margin-top: 20px;
-    padding: 18px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    background-color: #ffffff;
-    font-weight: bold;
-    color: #444;
-  }
-  
-  .loading,
-  .error,
-  .not-found {
-    font-size: 20px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .loading {
-    color: #007bff;
-  }
-  
-  .error {
-    color: #d9534f;
-  }
-  
-  .not-found {
-    color: #ff9800;
-  }
-  
+}

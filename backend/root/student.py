@@ -3,59 +3,64 @@ from google.cloud import firestore
 from pydantic import BaseModel
 import logging
 
-
+# Initialize Firestore client
 db = firestore.Client()
 
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
+# Initialize APIRouter
 router = APIRouter()
 
-
+# Pydantic models for request validation
 class StudentSchema(BaseModel):
-    enrollment_no: int 
     name: str
-    quiz_score: float
+    engagement_score: float
     attendance: float
     studytime: float
-    engagement_score: float
+    enrollment_no: int
 
-
+# Endpoint to create a student and add a session
 @router.post("/students/")
 async def create_student(student: StudentSchema):
     try:
-      
         enrollment_no_str = str(student.enrollment_no)
-        logger.info(f"Creating student with enrollment number: {enrollment_no_str}")
+        logger.info(f"Creating/updating student with enrollment number: {enrollment_no_str}")
 
         student_ref = db.collection("students").document(enrollment_no_str)
-        if student_ref.get().exists:
-            logger.warning(f"Student with enrollment number {enrollment_no_str} already exists")
-            raise HTTPException(status_code=400, detail="Student with this enrollment number already exists")
 
-        student_ref.set(student.model_dump())
-        logger.info(f"Student {enrollment_no_str} added successfully")
+        # Create student document if it doesn't exist
+        if not student_ref.get().exists:
+            student_ref.set({
+                "name": student.name,
+                "enrollment_no": student.enrollment_no,
+            })
+            logger.info(f"Student document created with name: {student.name} and enrollment_no: {student.enrollment_no}")
+        else:
+            logger.info(f"Student document already exists for enrollment number: {enrollment_no_str}")
 
-        return {"message": "Student added successfully", **student.model_dump()}
+        # Add new session
+        sessions_ref = student_ref.collection("sessions")
+        sessions_count = len(list(sessions_ref.stream()))
+
+        session_id = f"session{sessions_count + 1}"
+        session_data = {
+            "engagement_score": student.engagement_score,
+            "attendance": student.attendance,
+            "studytime": student.studytime,
+            "timestamp": firestore.SERVER_TIMESTAMP,
+        }
+        sessions_ref.document(session_id).set(session_data)
+
+        logger.info(f"Session {session_id} added for student {enrollment_no_str}")
+        return {"message": "Student session added successfully"}
 
     except Exception as e:
-        logger.error(f"Error creating student: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while adding the student")
+        logger.error(f"Error creating student session: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while adding the student session")
 
-
-@router.get("/students/")
-async def get_students():
-    try:
-        logger.info("Fetching all students")
-        students = [doc.to_dict() for doc in db.collection("students").stream()]
-        return students
-
-    except Exception as e:
-        logger.error(f"Error fetching students: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while fetching students")
-
-
+# Endpoint to fetch student data
 @router.get("/students/{enrollment_no}")
 async def get_student(enrollment_no: str):
     try:
@@ -67,48 +72,43 @@ async def get_student(enrollment_no: str):
             logger.warning(f"Student with enrollment number {enrollment_no} not found")
             raise HTTPException(status_code=404, detail="Student not found")
 
-        return student.to_dict()
+        student_data = student.to_dict()
+        logger.info(f"Student data retrieved: {student_data}")
 
+        if "name" not in student_data or "enrollment_no" not in student_data:
+            raise HTTPException(status_code=500, detail="Invalid student data in Firestore")
+
+        return {
+            "name": student_data["name"],
+            "enrollment_no": student_data["enrollment_no"],
+        }
+
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Error fetching student: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while fetching the student")
 
-@router.put("/students/{enrollment_no}")
-async def update_student(enrollment_no: str, updated_data: StudentSchema):
+# Endpoint to fetch sessions for a student
+@router.get("/students/{enrollment_no}/sessions")
+async def get_sessions(enrollment_no: str):
     try:
-        logger.info(f"Updating student with enrollment number: {enrollment_no}")
+        logger.info(f"Fetching sessions for enrollment number: {enrollment_no}")
         student_ref = db.collection("students").document(enrollment_no)
 
+        # Check if the student exists
         if not student_ref.get().exists:
             logger.warning(f"Student with enrollment number {enrollment_no} not found")
             raise HTTPException(status_code=404, detail="Student not found")
 
-       
-        student_ref.update(updated_data.model_dump())
-        logger.info(f"Student {enrollment_no} updated successfully")
+        # Fetch sessions from the sessions subcollection
+        sessions_ref = student_ref.collection("sessions").order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
+        sessions = [session.to_dict() for session in sessions_ref]
 
-        return {"message": "Student updated successfully"}
+        return sessions
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        logger.error(f"Error updating student: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while updating the student")
-
-
-@router.delete("/students/{enrollment_no}")
-async def delete_student(enrollment_no: str):
-    try:
-        logger.info(f"Deleting student with enrollment number: {enrollment_no}")
-        student_ref = db.collection("students").document(enrollment_no)
-
-        if not student_ref.get().exists:
-            logger.warning(f"Student with enrollment number {enrollment_no} not found")
-            raise HTTPException(status_code=404, detail="Student not found")
-
-        student_ref.delete()
-        logger.info(f"Student {enrollment_no} deleted successfully")
-
-        return {"message": "Student deleted successfully"}
-
-    except Exception as e:
-        logger.error(f"Error deleting student: {e}")
-        raise HTTPException(status_code=500, detail="An error occurred while deleting the student")
+        logger.error(f"Error fetching sessions: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while fetching sessions")
